@@ -7,7 +7,7 @@ The exportation of these messages can be done in a low priority task, but this i
 
 #API
 The API is very simple and small, there are only three main methods
-##addMessage( string )
+####addMessage( string )
 Simple API to add a string message. After calling the string is buffered in an internal buffer till getActEntry() is called.
 Then the read pointer gets incremented.
 
