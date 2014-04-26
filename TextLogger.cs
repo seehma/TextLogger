@@ -4,8 +4,19 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace KukaMatlabConnector
+/* ====================================================================================================================== */
+/**
+ *  Namespace TextLogger
+ * 
+ */
+/* ====================================================================================================================== */
+namespace TextLogger
 {
+    /* ------------------------------------------------------------------------------------------------------------------------------- */
+    /**
+     *  Class TextLogger 
+     */
+    /* ------------------------------------------------------------------------------------------------------------------------------- */
     public class TextLogger
     {
         const uint internalbufferSize_ = 255;
@@ -42,9 +53,13 @@ namespace KukaMatlabConnector
             }
         }
 
+        // counts the id for every instance, starts with 1 and goes till the instance is closed
         int id_;
+
+        // empty logging buffer, gets initialized when the constructor runs through
         loggingBufferEntry[] loggingBuffer_;
 
+        // loggingBufferEntry type ... the buffer contains an array of this type
         public struct loggingBufferEntry
         {
             public int id;
@@ -65,14 +80,18 @@ namespace KukaMatlabConnector
         /** 
          *   CLASS TextLogger
          * 
-         * 
-         * 
+         *   constructor ... of Class TextLogger
+         *   
+         *   @param    bufferSize ... Size of Buffer in entries
          */
         /* ====================================================================================================================== */
         public TextLogger( uint bufferSize )
         {
+            // initialize mutex for TextLogger Class
             mutexEntryCount = new System.Threading.Mutex(false, "entryCount");
 
+            // check if buffersize is non equal to zero, then initialize buffer with given size
+            // else take the default size of 255
             if (bufferSize != 0)
             {
                 loggingBuffer_ = new loggingBufferEntry[bufferSize];
@@ -84,16 +103,19 @@ namespace KukaMatlabConnector
                 bufferSize_ = internalbufferSize_;
             }
 
-            readPointer_ = 0;
-            writePointer_ = 0;
-            id_ = 0;
+            readPointer_ = 0; // initialize readPointer with zero
+            writePointer_ = 0; // initialize writePointer with zero
+            id_ = 1; // initialize the id variable with 1 => zero would be a non valid id
         }
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
         /**
+         *  @brief   inserts a message into the buffer, if the buffer is full no more message can be entered so it returns 
+         *           true => error happens
          * 
-         * 
-         * 
+         *  @param   message ... message as String type
+         *  
+         *  @retval  bool ... returns fals if the message was entered, returns true if an error happens
          */
         /* ---------------------------------------------------------------------------------------------------------------------- */
         public bool addMessage(String message)
@@ -117,15 +139,20 @@ namespace KukaMatlabConnector
 
                 loggingBuffer_[localWritePointer] = entry;
             }
+            else
+            {
+                errReturn = true;
+            }
 
             return errReturn;
         }
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
         /**
+         *  @brief   public function which returns the actual count of entries in the buffer
+         *           if not equal to zero getActEntry will return one entry out of the buffer
          * 
-         * 
-         * 
+         *  @retval  uint ... actual count of entries in the buffer
          */
         /* ---------------------------------------------------------------------------------------------------------------------- */
         public uint getEntryCount()
@@ -158,9 +185,9 @@ namespace KukaMatlabConnector
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
         /**
+         *  @brief   internal function which increments the read pointer and looks if it is allowed to increment
          * 
-         * 
-         * 
+         *  @retval  none
          */
         /* ---------------------------------------------------------------------------------------------------------------------- */
         private void incrementReadPointer()
@@ -178,9 +205,9 @@ namespace KukaMatlabConnector
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
         /**
+         *  @brief   internal function to increment the buffers write pointer
          * 
-         * 
-         * 
+         *  @retval  none
          */
         /* ---------------------------------------------------------------------------------------------------------------------- */
         private bool incrementWritePointer()
@@ -212,9 +239,9 @@ namespace KukaMatlabConnector
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
         /**
+         *  @brief    returns the entry on which the read pointer stands in buffer
          * 
-         * 
-         * 
+         *  @retval   TextLogger.loggingBufferEntry ... entry as described in the structure declaration
          */
         /* ---------------------------------------------------------------------------------------------------------------------- */
         public TextLogger.loggingBufferEntry getActEntry()
